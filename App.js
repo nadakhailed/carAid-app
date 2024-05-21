@@ -35,6 +35,11 @@ export default function App() {
             component={LanguageSelectionScreen}
             options={{ headerShown: false }}
           />
+
+
+
+
+          
           <Stack.Screen
             name="WelcomeScreen"
             component={WelcomeScreen}
