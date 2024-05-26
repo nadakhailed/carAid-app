@@ -15,6 +15,11 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+
+
+
+
+      
       <View style={tailwind`p-5`}>
         <Image
           style={{ width: 100, height: 100, resizeMode: "contain" }}
