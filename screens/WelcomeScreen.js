@@ -5,9 +5,9 @@ import COLORS from "../constants/colors";
 //
 
 const WelcomeScreen = ({ route, navigation }) => {
-  const { language } = route.params;
+  // const { language } = route.params;
 
-  console.log("Selected language:", language);
+  // console.log("Selected language:", language);
 //comment 
   return (
     <SafeAreaView style={styles.container}>
