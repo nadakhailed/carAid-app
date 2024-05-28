@@ -1,5 +1,4 @@
-/*
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +8,7 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import COLORS from "../constants/colors";
 import MapView, { Marker } from "react-native-maps";
 
@@ -16,12 +16,25 @@ const MapViewNearby = ({ navigation }) => {
   const today = new Date().toDateString();
 
   const [menuVisible, setMenuVisible] = useState(false);
+  const [orderModalVisible, setOrderModalVisible] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [searching, setSearching] = useState(false);
   const [markers, setMarkers] = useState([]);
+  const [selectedMarker, setSelectedMarker] = useState(null);
+
+  const userLocation = {
+    latitude: 31.265580739922147,
+    longitude: 29.998229724273717,
+  };
+
+  const [userLocationName, setUserLocationName] = useState("Your Location");
+  const [selectedMarkerName, setSelectedMarkerName] =
+    useState("Selected Location");
+
+  const [token, setToken] = useState(null);
 
   const navigateToProfile = () => {
-    navigation.navigate("Login");
+    navigation.navigate("SwitchServiceTypeScreen");
   };
 
   const openMenu = () => {
@@ -29,10 +42,12 @@ const MapViewNearby = ({ navigation }) => {
   };
 
   const closeMenu = () => {
-    if (searching) {
-      cancelSearch();
-    }
+    cancelSearch();
     setMenuVisible(false);
+  };
+
+  const closeOrderModal = () => {
+    setOrderModalVisible(false);
   };
 
   const selectOption = (option) => {
@@ -70,565 +85,533 @@ const MapViewNearby = ({ navigation }) => {
     }
   };
 
-  return (
-    <View style={{ flex: 1 }}>
-      <Text style={styles.dateText}>{today}</Text>
+  const calculateDistance = (marker) => {
+    const R = 6371;
+    const dLat = ((marker.latitude - userLocation.latitude) * Math.PI) / 180;
+    const dLon = ((marker.longitude - userLocation.longitude) * Math.PI) / 180;
+    const a =
+      0.5 -
+      Math.cos(dLat) / 2 +
+      (Math.cos((userLocation.latitude * Math.PI) / 180) *
+        Math.cos((marker.latitude * Math.PI) / 180) *
+        (1 - Math.cos(dLon))) /
+        2;
+    const distance = R * 2 * Math.asin(Math.sqrt(a));
+    return distance.toFixed(2);
+  };
 
+  const onMarkerPress = (marker) => {
+    setSelectedMarker(marker);
+    setMenuVisible(true);
+  };
+
+  const handleOrderPress = () => {
+    setMenuVisible(false);
+    setOrderModalVisible(true);
+  };
+
+  const handleProfilePress = () => {
+    closeOrderModal();
+    navigation.navigate("DriverProfileScreen");
+  };
+
+  const handleRideDetailsPress = () => {
+    closeOrderModal();
+    if (selectedMarker) {
+      const distance = calculateDistance(selectedMarker);
+      const fare = (distance * 5).toFixed(2);
+      const name = "Jessica Bob";
+      const date = "2 May'19 at 2:20 pm";
+
+      navigation.navigate("RideDetailsScreen", { cost: fare, name, date });
+    }
+  };
+
+  const handleCancelPress = () => {
+    closeOrderModal();
+    navigation.navigate("CancelRideScreen");
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("userToken");
+      navigation.navigate("Login");
+    } catch (error) {
+      console.error("Error clearing user token", error);
+    }
+  };
+
+  const renderOrderModalContent = () => {
+    if (selectedMarker) {
+      const distance = calculateDistance(selectedMarker);
+      const timeToArrive = `${((distance / 30) * 60).toFixed(2)} mins`;
+
+      return (
+        <>
+          <TouchableOpacity onPress={closeOrderModal}>
+            <Text style={styles.closeButton}>X</Text>
+          </TouchableOpacity>
+          <View style={styles.topContainerOrder}>
+            <Text style={styles.timeToArriveOrder}>{timeToArrive}</Text>
+            <Image
+              source={require("../assets/facebook.png")}
+              style={styles.userImageOrder}
+            />
+            <Text style={styles.distanceTextOrder}>{distance} mi</Text>
+            <TouchableOpacity onPress={handleProfilePress}>
+              <Image
+                source={require("../assets/facebook.png")}
+                style={styles.callIcon}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Image
+                source={require("../assets/facebook.png")}
+                style={styles.icon}
+              />
+              <Text style={styles.buttonText}>Chat</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleProfilePress}
+            >
+              <Image
+                source={require("../assets/facebook.png")}
+                style={styles.icon}
+              />
+              <Text style={styles.buttonText}>Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleCancelPress}
+            >
+              <Image
+                source={require("../assets/facebook.png")}
+                style={styles.icon}
+              />
+              <Text style={styles.buttonText}>Cancel Trip</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={[styles.arrivedButton, styles.disabledButton]}
+            disabled={true}
+          >
+            <Text style={styles.arrivedButtonText}>ARRIVED</Text>
+          </TouchableOpacity>
+        </>
+      );
+    }
+    return null;
+  };
+
+  const renderModalContent = () => {
+    if (selectedMarker) {
+      const distance = calculateDistance(selectedMarker);
+      const fare = (distance * 5).toFixed(2);
+      const rate = 4.5;
+      const timeToArrive = `${((distance / 30) * 60).toFixed(2)} mins`;
+
+      return (
+        <>
+          <View style={styles.topContainer}>
+            <TouchableOpacity onPress={closeMenu}>
+              <Text style={styles.closeButton}>X</Text>
+            </TouchableOpacity>
+            <Text style={styles.timeToArrive}>{timeToArrive}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoText}>{distance} km</Text>
+            <Text style={styles.infoText}>${fare}</Text>
+            <Text style={styles.infoText}>{rate} stars</Text>
+          </View>
+          <Text style={styles.distanceText}>{userLocationName}</Text>
+          <Text style={styles.distanceText}>{selectedMarkerName}</Text>
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              styles.searchButton,
+              selectedOptions.length === 0 && styles.disabledButton,
+            ]}
+            onPress={handleOrderPress}
+            disabled={searching || selectedOptions.length === 0}
+          >
+            <Text style={styles.searchButton}>Tap to Order</Text>
+          </TouchableOpacity>
+        </>
+      );
+    }
+    return (
+      <>
+        <TouchableOpacity onPress={closeMenu}>
+          <Text style={styles.closeButton}>X</Text>
+        </TouchableOpacity>
+        <Text style={styles.FindingService}>Finding Service</Text>
+        <TouchableOpacity
+          onPress={() => selectOption("Mechanic")}
+          style={[
+            styles.menuItem,
+            selectedOptions.includes("Mechanic") && styles.selectedOption,
+          ]}
+        >
+          <Text style={styles.menuItemText}>Mechanic Nearby</Text>
+          <Text style={styles.subText}>More mechanics than usual</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => selectOption("Spare Parts Shop")}
+          style={[
+            styles.menuItem,
+            selectedOptions.includes("Spare Parts Shop") &&
+              styles.selectedOption,
+          ]}
+        >
+          <Text style={styles.menuItemText}>Spare Shop Nearby</Text>
+          <Text style={styles.subText}>More Shops than usual</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            styles.searchButton,
+            selectedOptions.length === 0 && styles.disabledButton,
+          ]}
+          onPress={handleSearchPress}
+          disabled={searching || selectedOptions.length === 0}
+        >
+          <Text style={styles.searchButton}>Search</Text>
+        </TouchableOpacity>
+        {searching && (
+          <TouchableOpacity
+            style={[styles.menuItem, styles.cancelButton]}
+            onPress={cancelSearch}
+          >
+            <Text style={styles.cancelButton}>Cancel</Text>
+          </TouchableOpacity>
+        )}
+        {searching && (
+          <ActivityIndicator size="large" color={COLORS.darkColorPrim} />
+        )}
+        {markers.length > 0 && (
+          <Text style={styles.foundText}>
+            {markers.length} services found nearby
+          </Text>
+        )}
+      </>
+    );
+  };
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const userToken = await AsyncStorage.getItem("userToken");
+        if (!userToken) {
+          navigation.navigate("Login");
+        }
+        // setToken(userToken);
+      } catch (error) {
+        console.error("Error fetching user token", error);
+      }
+    };
+
+    fetchToken();
+
+    return () => {
+      console.log("MapViewNearby component will unmount");
+    };
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          ...userLocation,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
+      >
+        <Marker
+          coordinate={userLocation}
+          title="User Location"
+          description={userLocationName}
+        />
+        {markers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={marker}
+            title={`Marker ${index + 1}`}
+            description={selectedMarkerName}
+            onPress={() => onMarkerPress(marker)}
+          />
+        ))}
+      </MapView>
       <TouchableOpacity
-        style={styles.userImageContainer}
+        style={styles.profileButton}
         onPress={navigateToProfile}
       >
         <Image
           source={require("../assets/facebook.png")}
-          style={styles.userImage}
+          style={styles.profileImage}
         />
       </TouchableOpacity>
+      <Text style={styles.titleToday}>{today}</Text>
 
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={{
-          latitude: 31.265580739922147,
-          longitude: 29.998229724273717,
-          latitudeDelta: 0.009,
-          longitudeDelta: 0.008,
-        }}
+      <Modal visible={menuVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>{renderModalContent()}</View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={orderModalVisible}
+        animationType="slide"
+        transparent={true}
       >
-        {markers.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={marker}
-            title={`Randomized Marker ${index + 1}`}
-          />
-        ))}
-      </MapView>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>{renderOrderModalContent()}</View>
+        </View>
+      </Modal>
 
+      {/* Menu Button */}
       <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
         <Text style={styles.menuButtonText}>Menu</Text>
       </TouchableOpacity>
-
-      <Modal
-        visible={menuVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={closeMenu}
-      >
-        <View style={styles.menuSlider}>
-          <TouchableOpacity onPress={closeMenu}>
-            <Text style={styles.closeButton}>X</Text>
-          </TouchableOpacity>
-          <Text style={styles.FindingService}>Finding Service</Text>
-
-          <TouchableOpacity
-            onPress={() => selectOption("Mechanic")}
-            style={[
-              styles.menuItem,
-              selectedOptions.includes("Mechanic") && styles.selectedOption,
-            ]}
-          >
-            <Text style={styles.menuItemText}>Mechanic Nearby</Text>
-            <Text style={styles.subText}>More mechanics than usual</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => selectOption("Spare Parts Shop")}
-            style={[
-              styles.menuItem,
-              selectedOptions.includes("Spare Parts Shop") &&
-                styles.selectedOption,
-            ]}
-          >
-            <Text style={styles.menuItemText}>Spare Shop Nearby</Text>
-            <Text style={styles.subText}>More Shops than usual</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.menuItem,
-              styles.searchButton,
-              selectedOptions.length === 0 && styles.disabledButton,
-            ]}
-            onPress={handleSearchPress}
-            disabled={searching || selectedOptions.length === 0}
-          >
-            <Text style={styles.searchButton}>Search</Text>
-          </TouchableOpacity>
-
-          {searching && (
-            <TouchableOpacity
-              style={[styles.menuItem, styles.cancelButton]}
-              onPress={cancelSearch}
-            >
-              <Text style={styles.cancelButton}>Cancel</Text>
-            </TouchableOpacity>
-          )}
-
-          {searching && (
-            <ActivityIndicator size="large" color={COLORS.darkColorPrim} />
-          )}
-
-          {searching && markers.length > 0 && (
-            <Text style={styles.foundText}>
-              {markers.length} markers found for selected options
-            </Text>
-          )}
-        </View>
-      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  dateText: {
+  modalContainer: {
     position: "absolute",
-    top: 50,
-    left: "50%",
-    transform: [{ translateX: -100 }],
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
-    zIndex: 1,
-    backgroundColor: COLORS.white,
-    width: 200,
-    color: COLORS.darkGrey,
-    padding: 5,
-    shadowColor: COLORS.black,
+    bottom: 0,
+    width: "100%",
+    backgroundColor: COLORS.white, // Assuming light background color
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 20, // Padding from the bottom
+    paddingHorizontal: 20, // Horizontal padding
   },
-  userImageContainer: {
+  modalContent: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.white, // Assuming light background color
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  profileButton: {
     position: "absolute",
-    top: 45,
+    top: 35,
     right: 20,
-    zIndex: 1,
+    zIndex: 10,
   },
-  userImage: {
+  profileImage: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 25,
+  },
+  closeButton: {
+    position: "absolute",
+    top: -10,
+    fontSize: 24,
+    color: COLORS.darkColorPrim,
+  },
+  titleToday: {
+    position: "absolute",
+    top: 40,
+    left: 10,
+    fontSize: 18,
+    color: COLORS.darkColorPrim,
+    backgroundColor: COLORS.white,
+    width: 180,
+    textAlign: "center",
+    padding: 5,
+    borderRadius: 5,
+    marginLeft: 105,
+    zIndex: 10,
+  },
+  FindingService: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+    color: COLORS.darkColorPrim,
   },
   menuButton: {
     position: "absolute",
     bottom: 20,
     alignSelf: "center",
-    backgroundColor: "white",
-    borderColor: COLORS.darkColorPrim,
-    borderRadius: 50,
-    borderWidth: 2,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    elevation: 2,
-    zIndex: 2,
+    backgroundColor: COLORS.darkColorPrim,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 30,
   },
   menuButtonText: {
-    width: 100,
-    color: COLORS.darkColorPrim,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  menuSlider: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "white",
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 2,
-  },
-  FindingService: {
-    fontSize: 20,
-    fontWeight: "bold",
-    alignContent: "center",
-    alignSelf: "center",
-    top: -33,
-  },
-  closeButton: {
+    color: COLORS.white,
     fontSize: 18,
     fontWeight: "bold",
-    alignSelf: "center",
-    marginBottom: 10,
-    color: COLORS.darkColorPrim,
-    left: -170,
   },
   menuItem: {
-    marginBottom: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "transparent",
-    borderRadius: 10,
+    width: "100%",
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: COLORS.white,
+    borderRadius: 5,
   },
   menuItemText: {
     fontSize: 18,
     fontWeight: "bold",
+    color: COLORS.black,
   },
   subText: {
     fontSize: 14,
-    color: "gray",
+    color: COLORS.black,
   },
   selectedOption: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
     borderColor: COLORS.darkColorPrim,
-    borderWidth: 2,
   },
   searchButton: {
     backgroundColor: COLORS.darkColorPrim,
-    color: "white",
+    borderRadius: 5,
     textAlign: "center",
-    padding: 5,
-    borderRadius: 10,
     fontSize: 18,
     fontWeight: "bold",
+    color: COLORS.white,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   cancelButton: {
     backgroundColor: "red",
-    color: "white",
+    borderRadius: 5,
     textAlign: "center",
-    padding: 5,
-    borderRadius: 10,
     fontSize: 18,
     fontWeight: "bold",
+    color: COLORS.white,
   },
-  foundText: {
+  topContainer: {
+    padding: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginTop: -35,
+    marginBottom: -15,
+  },
+  infoRow: {
+    marginTop: 25,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 30,
+  },
+  timeToArrive: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
     color: COLORS.darkColorPrim,
+    marginRight: 110,
   },
-  searchingText: {
-    fontSize: 16,
+
+  infoText: {
+    fontSize: 18,
     fontWeight: "bold",
+  },
+  distanceText: {
+    fontSize: 16,
     textAlign: "center",
-    marginTop: 10,
-    color: COLORS.darkColorPrim,
   },
-  disabledButton: {
-    opacity: 0.5,
+  topContainerOrder: {
+    padding: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginTop: -35,
+    marginBottom: -15,
   },
-});
-
-export default MapViewNearby;
-*/
-
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Modal,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import COLORS from '../constants/colors';
-import MapView, { Marker } from 'react-native-maps';
-
-const MapViewNearby = ({ navigation }) => {
-  const today = new Date().toDateString();
-
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [markers, setMarkers] = useState([]);
-
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem('userToken');
-      if (!token) {
-        navigation.navigate('Login');
-      }
-    };
-
-    checkToken();
-  }, []);
-
-  const logout = async () => {
-    await AsyncStorage.removeItem('userToken');
-    navigation.navigate('Login');
-  };
-
-  const navigateToProfile = () => {
-    logout();
-  };
-
-  const openMenu = () => {
-    setMenuVisible(true);
-  };
-
-  const closeMenu = () => {
-    if (searching) {
-      cancelSearch();
-    }
-    setMenuVisible(false);
-  };
-
-  const selectOption = (option) => {
-    if (selectedOptions.length < 2 && !selectedOptions.includes(option)) {
-      setSelectedOptions([...selectedOptions, option]);
-    } else if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((item) => item !== option));
-    }
-  };
-
-  const startSearch = () => {
-    setSearching(true);
-
-    setTimeout(() => {
-      const randomizedMarkers = [];
-      for (let i = 0; i < 5; i++) {
-        const lat = 31.26558 + (Math.random() - 0.5) * 0.02;
-        const lng = 29.99823 + (Math.random() - 0.5) * 0.02;
-        randomizedMarkers.push({ latitude: lat, longitude: lng });
-      }
-      setMarkers(randomizedMarkers);
-
-      setSearching(false);
-    }, 3000);
-  };
-
-  const cancelSearch = () => {
-    setSearching(false);
-    setMenuVisible(false);
-  };
-
-  const handleSearchPress = () => {
-    if (selectedOptions.length > 0 && !searching) {
-      startSearch();
-    }
-  };
-
-  return (
-    <View style={{ flex: 1 }}>
-      <Text style={styles.dateText}>{today}</Text>
-
-      <TouchableOpacity
-        style={styles.userImageContainer}
-        onPress={navigateToProfile}
-      >
-        <Image
-          source={require('../assets/facebook.png')}
-          style={styles.userImage}
-        />
-      </TouchableOpacity>
-
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={{
-          latitude: 31.265580739922147,
-          longitude: 29.998229724273717,
-          latitudeDelta: 0.009,
-          longitudeDelta: 0.008,
-        }}
-      >
-        {markers.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={marker}
-            title={`Randomized Marker ${index + 1}`}
-          />
-        ))}
-      </MapView>
-
-      <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
-        <Text style={styles.menuButtonText}>Menu</Text>
-      </TouchableOpacity>
-
-      <Modal
-        visible={menuVisible}
-        animationType='slide'
-        transparent={true}
-        onRequestClose={closeMenu}
-      >
-        <View style={styles.menuSlider}>
-          <TouchableOpacity onPress={closeMenu}>
-            <Text style={styles.closeButton}>X</Text>
-          </TouchableOpacity>
-          <Text style={styles.FindingService}>Finding Service</Text>
-
-          <TouchableOpacity
-            onPress={() => selectOption('Mechanic')}
-            style={[
-              styles.menuItem,
-              selectedOptions.includes('Mechanic') && styles.selectedOption,
-            ]}
-          >
-            <Text style={styles.menuItemText}>Mechanic Nearby</Text>
-            <Text style={styles.subText}>More mechanics than usual</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => selectOption('Spare Parts Shop')}
-            style={[
-              styles.menuItem,
-              selectedOptions.includes('Spare Parts Shop') &&
-                styles.selectedOption,
-            ]}
-          >
-            <Text style={styles.menuItemText}>Spare Shop Nearby</Text>
-            <Text style={styles.subText}>More Shops than usual</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.menuItem,
-              styles.searchButton,
-              selectedOptions.length === 0 && styles.disabledButton,
-            ]}
-            onPress={handleSearchPress}
-            disabled={searching || selectedOptions.length === 0}
-          >
-            <Text style={styles.searchButton}>Search</Text>
-          </TouchableOpacity>
-
-          {searching && (
-            <TouchableOpacity
-              style={[styles.menuItem, styles.cancelButton]}
-              onPress={cancelSearch}
-            >
-              <Text style={styles.cancelButton}>Cancel</Text>
-            </TouchableOpacity>
-          )}
-
-          {searching && <ActivityIndicator size='large' color={COLORS.darkColorPrim} />}
-
-          {searching && markers.length > 0 && (
-            <Text style={styles.foundText}>
-              {markers.length} markers found for selected options
-            </Text>
-          )}
-        </View>
-      </Modal>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  dateText: {
-    position: 'absolute',
-    top: 50,
-    left: '50%',
-    transform: [{ translateX: -100 }],
-    textAlign: 'center',
+  timeToArriveOrder: {
     fontSize: 18,
-    fontWeight: 'bold',
-    zIndex: 1,
-    backgroundColor: COLORS.white,
-    width: 200,
-    color: COLORS.darkGrey,
-    padding: 5,
-    shadowColor: COLORS.black,
+    fontWeight: "bold",
+    color: COLORS.black,
+    marginRight: 5,
   },
-  userImageContainer: {
-    position: 'absolute',
-    top: 45,
-    right: 20,
-    zIndex: 1,
+  userImageOrder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
-  userImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  distanceTextOrder: {
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: 5,
   },
-  menuButton: {
-    position: 'absolute',
-    bottom: 20,
-    alignSelf: 'center',
-    backgroundColor: 'white',
-    borderColor: COLORS.darkColorPrim,
-    borderRadius: 50,
-    borderWidth: 2,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    elevation: 2,
-    zIndex: 2,
+  callIcon: {
+    width: 30,
+    height: 30,
   },
-  menuButtonText: {
-    width: 100,
+  CallTextOrder: {
+    fontSize: 16,
     color: COLORS.darkColorPrim,
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
+    textAlign: "center",
+    marginVertical: 5,
   },
-  menuSlider: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 2,
+  line: {
+    width: "100%",
+    height: 1,
+    backgroundColor: COLORS.lineColor,
+    marginVertical: 10,
   },
-  FindingService: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    alignContent: 'center',
-    alignSelf: 'center',
-    top: -33,
+  buttonContainer: {
+    padding: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginTop: -35,
+    marginBottom: -15,
   },
-  closeButton: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    marginBottom: 10,
-    color: COLORS.darkColorPrim,
-    left: -170,
+  iconButton: {
+    alignItems: "center",
   },
-  menuItem: {
-    marginBottom: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'transparent',
-    borderRadius: 10,
+  icon: {
+    width: 30,
+    height: 30,
   },
-  menuItemText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  subText: {
+  buttonText: {
     fontSize: 14,
-    color: 'gray',
+    marginTop: 5,
   },
-  selectedOption: {
-    borderColor: COLORS.darkColorPrim,
-    borderWidth: 2,
-  },
-  searchButton: {
+  arrivedButton: {
     backgroundColor: COLORS.darkColorPrim,
-    color: 'white',
-    textAlign: 'center',
-    padding: 5,
-    borderRadius: 10,
+    padding: 15,
+    borderRadius: 5,
+    textAlign: "center",
+    alignContent: "center",
+    marginTop: 10,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    color: COLORS.white,
+    marginBottom: 25,
   },
-  cancelButton: {
-    backgroundColor: 'red',
-    color: 'white',
-    textAlign: 'center',
-    padding: 5,
-    borderRadius: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
+  arrivedButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    alignContent: "center",
   },
   foundText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-    color: COLORS.darkColorPrim,
-  },
-  searchingText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-    color: COLORS.darkColorPrim,
-  },
-  disabledButton: {
-    opacity: 0.5,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
   },
 });
 
