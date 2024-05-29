@@ -21,7 +21,7 @@ const Reports = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Image
-        source={require("../assets/facebook.png")}
+        source={{ uri: "https://www.gravatar.com/avatar/?d=mp" }}
         style={styles.profileImage}
       />
       <View style={styles.textContainer}>
