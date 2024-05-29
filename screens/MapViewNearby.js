@@ -52,11 +52,11 @@ const MapViewNearby = ({ navigation }) => {
     setOrderModalVisible(false);
   };
 
-  const selectOption = option => {
+  const selectOption = (option) => {
     if (selectedOptions.length < 2 && !selectedOptions.includes(option)) {
       setSelectedOptions([...selectedOptions, option]);
     } else if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter(item => item !== option));
+      setSelectedOptions(selectedOptions.filter((item) => item !== option));
     }
   };
 
@@ -87,7 +87,7 @@ const MapViewNearby = ({ navigation }) => {
     }
   };
 
-  const calculateDistance = marker => {
+  const calculateDistance = (marker) => {
     const R = 6371;
     const dLat = ((marker.latitude - userLocation.latitude) * Math.PI) / 180;
     const dLon = ((marker.longitude - userLocation.longitude) * Math.PI) / 180;
@@ -160,13 +160,15 @@ const MapViewNearby = ({ navigation }) => {
           <View style={styles.topContainerOrder}>
             <Text style={styles.timeToArriveOrder}>{timeToArrive}</Text>
             <Image
-              source={require("../assets/facebook.png")}
+              source={{ uri: "https://www.gravatar.com/avatar/?d=mp" }}
               style={styles.userImageOrder}
             />
             <Text style={styles.distanceTextOrder}>{distance} mi</Text>
             <TouchableOpacity onPress={handleProfilePress}>
               <Image
-                source={require("../assets/facebook.png")}
+                source={{
+                  uri: "https://static.vecteezy.com/system/resources/thumbnails/016/416/792/small_2x/phone-call-icon-in-black-colors-telephone-signs-illustration-png.png",
+                }}
                 style={styles.callIcon}
               />
             </TouchableOpacity>
@@ -175,7 +177,9 @@ const MapViewNearby = ({ navigation }) => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.iconButton}>
               <Image
-                source={require("../assets/facebook.png")}
+                source={{
+                  uri: "https://cdn-icons-png.flaticon.com/512/3114/3114553.png",
+                }}
                 style={styles.icon}
               />
               <Text style={styles.buttonText}>Chat</Text>
@@ -185,7 +189,7 @@ const MapViewNearby = ({ navigation }) => {
               onPress={handleProfilePress}
             >
               <Image
-                source={require("../assets/facebook.png")}
+                source={{ uri: "https://www.gravatar.com/avatar/?d=mp" }}
                 style={styles.icon}
               />
               <Text style={styles.buttonText}>Profile</Text>
@@ -195,7 +199,9 @@ const MapViewNearby = ({ navigation }) => {
               onPress={handleCancelPress}
             >
               <Image
-                source={require("../assets/facebook.png")}
+                source={{
+                  uri: "https://cdn-icons-png.flaticon.com/512/66/66847.png",
+                }}
                 style={styles.icon}
               />
               <Text style={styles.buttonText}>Cancel Trip</Text>
@@ -359,7 +365,7 @@ const MapViewNearby = ({ navigation }) => {
         onPress={navigateToProfile}
       >
         <Image
-          source={require("../assets/facebook.png")}
+          source={{ uri: "https://www.gravatar.com/avatar/?d=mp" }}
           style={styles.profileImage}
         />
       </TouchableOpacity>
@@ -592,6 +598,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
+    borderRadius: 25,
     width: 30,
     height: 30,
   },
