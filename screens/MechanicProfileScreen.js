@@ -16,8 +16,8 @@ const MechanicProfileScreen = ({ navigation }) => {
       <View style={styles.menuContainer}>
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate("MapViewNearby")}
-        >
+          onPress={() => navigation.navigate("HomeNav")}
+            >
           <Text style={styles.menuItemText}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity
