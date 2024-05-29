@@ -12,7 +12,7 @@ import {
 const shops = [
   { id: "1", name: "Watnya" },
   { id: "2", name: "Watnya" },
-  { id: "3", name: "mahmoud" },
+  { id: "3", name: "Watnya" },
   { id: "4", name: "Watnya" },
 ];
 
@@ -40,7 +40,9 @@ const ShopListScreen = ({ navigation }) => {
       onPress={() => navigation.navigate("ShopDetailScreen", { shop: item })}
     >
       <Image
-        source={require("../assets/facebook.png")}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/3593/3593767.png",
+        }}
         style={styles.shopLogo}
       />
       <Text style={styles.shopName}>{item.name}</Text>
@@ -98,9 +100,10 @@ const styles = StyleSheet.create({
     height: 90,
   },
   shopLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    padding: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   shopName: {
     flex: 1,
