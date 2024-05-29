@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { AuthContext } from "../App";
 import COLORS from "../constants/colors";
 
-const CarOwnerProfileScreen = ({ navigation, logout }) => {
+const CarOwnerProfileScreen = ({ navigation }) => {
+  const { signOut } = useContext(AuthContext); 
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -16,7 +19,7 @@ const CarOwnerProfileScreen = ({ navigation, logout }) => {
       <View style={styles.menuContainer}>
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate("MapViewNearby")}
+          onPress={() => navigation.navigate("HomeNav")}
         >
           <Text style={styles.menuItemText}>Home</Text>
         </TouchableOpacity>
@@ -28,7 +31,7 @@ const CarOwnerProfileScreen = ({ navigation, logout }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate("VechicleDocuments")}
+          onPress={() => navigation.navigate("VehicleDocuments")}
         >
           <Text style={styles.menuItemText}>My Vehicle</Text>
         </TouchableOpacity>
@@ -46,7 +49,10 @@ const CarOwnerProfileScreen = ({ navigation, logout }) => {
         >
           <Text style={styles.menuItemText}>Switch</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={() => logout()}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={signOut} // Call signOut directly
+        >
           <Text style={styles.menuItemText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -82,7 +88,6 @@ const styles = StyleSheet.create({
   },
   userType: {
     fontSize: 14,
-    color: "#777",
     color: COLORS.white,
   },
   menuContainer: {

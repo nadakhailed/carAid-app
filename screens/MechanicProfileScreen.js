@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { AuthContext } from "../App";
 import COLORS from "../constants/colors";
 
 const MechanicProfileScreen = ({ navigation }) => {
+  const { signOut } = useContext(AuthContext);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -16,7 +19,7 @@ const MechanicProfileScreen = ({ navigation }) => {
       <View style={styles.menuContainer}>
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate("MapViewNearby")}
+          onPress={() => navigation.navigate("HomeNav")}
         >
           <Text style={styles.menuItemText}>Home</Text>
         </TouchableOpacity>
@@ -41,10 +44,7 @@ const MechanicProfileScreen = ({ navigation }) => {
         >
           <Text style={styles.menuItemText}>Switch</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate("Logout")}
-        >
+        <TouchableOpacity style={styles.menuItem} onPress={signOut}>
           <Text style={styles.menuItemText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -99,4 +99,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
 export default MechanicProfileScreen;

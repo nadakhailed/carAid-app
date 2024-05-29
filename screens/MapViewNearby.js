@@ -102,9 +102,13 @@ const MapViewNearby = ({ navigation }) => {
     return distance.toFixed(2);
   };
 
-  const onMarkerPress = marker => {
-    setSelectedMarker(marker);
-    setMenuVisible(true);
+  const onMarkerPress = (marker) => {
+    if (selectedOptions.includes("Spare Parts Shop")) {
+      navigation.navigate("ShopListScreen");
+    } else {
+      setSelectedMarker(marker);
+      setMenuVisible(true);
+    }
   };
 
   const handleOrderPress = () => {
