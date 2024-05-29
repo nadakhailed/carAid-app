@@ -8,13 +8,17 @@ const ShopDetailScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/facebook.png")}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/3593/3593767.png",
+        }}
         style={styles.shopLogo}
       />
       <Text style={styles.shopTitle}>{shop.name} for spare parts</Text>
       <View style={styles.ratingContainer}>
         <Image
-          source={require("../assets/facebook.png")}
+          source={{
+            uri: "https://cdn-icons-png.flaticon.com/512/1077/1077089.png",
+          }}
           style={styles.starRatings}
         />
         <Text style={styles.ratingText}>4.5 (200 Reviews)</Text>
