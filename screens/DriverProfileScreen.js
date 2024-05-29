@@ -21,7 +21,7 @@ const DriverProfileScreen = ({ navigation }) => {
       <View style={styles.upperContainer}>
         <View style={styles.header}>
           <Image
-            source={require("../assets/facebook.png")}
+            source={{ uri: "https://www.gravatar.com/avatar/?d=mp" }}
             style={styles.profileImage}
           />
           <Text style={styles.driverName}>Abo soso</Text>

@@ -23,7 +23,9 @@ const OffersScreen = ({ navigation }) => {
       onPress={() => navigation.navigate("OfferDetailsScreen", { offer: item })}
     >
       <Image
-        source={require("../assets/facebook.png")}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/1073/1073801.png",
+        }}
         style={styles.userIcon}
       />
       <Text style={styles.offerText}>{item.question}</Text>

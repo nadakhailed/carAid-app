@@ -13,7 +13,7 @@ const SwitchServiceTypeScreen = ({ navigation }) => {
     } else if (isCarOwner) {
       navigation.navigate("CarOwnerProfileScreen");
     } else if (isSparePartsShopOwner) {
-      // Navigate to the Spare Parts Shop Owner profile screen if needed
+      navigation.navigate("SparePartsProfileScreen");
     }
   };
 

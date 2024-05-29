@@ -12,25 +12,25 @@ const options = [
   {
     id: "1",
     name: "Statistics",
-    icon: require("../assets/facebook.png"),
+    icon: { uri: "https://cdn-icons-png.flaticon.com/512/2920/2920323.png" },
     screen: "Statistics",
   },
   {
     id: "2",
     name: "Reports",
-    icon: require("../assets/facebook.png"),
+    icon: { uri: "https://cdn-icons-png.flaticon.com/512/1553/1553118.png" },
     screen: "Reports",
   },
   {
     id: "3",
     name: "Earning",
-    icon: require("../assets/facebook.png"),
+    icon: { uri: "https://cdn-icons-png.flaticon.com/512/2685/2685027.png" },
     screen: "Earning",
   },
   {
     id: "4",
     name: "Traffic",
-    icon: require("../assets/facebook.png"),
+    icon: { uri: "https://cdn-icons-png.flaticon.com/512/1006/1006585.png" },
     screen: "Traffic",
   },
 ];

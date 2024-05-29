@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { AuthContext } from "../App";
 import COLORS from "../constants/colors";
 
-const MechanicProfileScreen = ({ navigation }) => {
+const SparePartsProfileScreen = ({ navigation }) => {
   const { signOut } = useContext(AuthContext);
 
   return (
@@ -14,7 +14,7 @@ const MechanicProfileScreen = ({ navigation }) => {
           style={styles.profileImage}
         />
         <Text style={styles.userName}>User Name</Text>
-        <Text style={styles.userType}>Mechanic</Text>
+        <Text style={styles.userType}>Spare Parts</Text>
       </View>
       <View style={styles.menuContainer}>
         <TouchableOpacity
@@ -29,11 +29,16 @@ const MechanicProfileScreen = ({ navigation }) => {
         >
           <Text style={styles.menuItemText}>My Subscription</Text>
         </TouchableOpacity>
-
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate("VehicleDocuments")}
+        >
+          <Text style={styles.menuItemText}>My Vehicle</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() =>
-            navigation.navigate("SettingsScreen", { userType: "mechanic" })
+            navigation.navigate("SettingsScreen", { userType: "spareParts" })
           }
         >
           <Text style={styles.menuItemText}>Settings</Text>
@@ -44,7 +49,10 @@ const MechanicProfileScreen = ({ navigation }) => {
         >
           <Text style={styles.menuItemText}>Switch</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={signOut}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={signOut} // Call signOut directly
+        >
           <Text style={styles.menuItemText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -80,7 +88,6 @@ const styles = StyleSheet.create({
   },
   userType: {
     fontSize: 14,
-    color: "#777",
     color: COLORS.white,
   },
   menuContainer: {
@@ -100,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MechanicProfileScreen;
+export default SparePartsProfileScreen;

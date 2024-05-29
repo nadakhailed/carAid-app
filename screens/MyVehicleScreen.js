@@ -14,31 +14,31 @@ const vehicles = [
     id: "1",
     model: "Toyota Prius",
     license: "AB 1234",
-    image: require("../assets/facebook.png"),
+    image: { uri: "https://cdn-icons-png.flaticon.com/512/3306/3306103.png" },
   },
   {
     id: "2",
     model: "Toyota Prius",
     license: "AB 1234",
-    image: require("../assets/facebook.png"),
+    image: { uri: "https://cdn-icons-png.flaticon.com/512/3306/3306103.png" },
   },
   {
     id: "3",
     model: "Toyota Prius",
     license: "AB 1234",
-    image: require("../assets/facebook.png"),
+    image: { uri: "https://cdn-icons-png.flaticon.com/512/3306/3306103.png" },
   },
   {
     id: "4",
     model: "Toyota Prius",
     license: "AB 1234",
-    image: require("../assets/facebook.png"),
+    image: { uri: "https://cdn-icons-png.flaticon.com/512/3306/3306103.png" },
   },
   {
     id: "5",
     model: "Toyota Prius",
     license: "AB 1234",
-    image: require("../assets/facebook.png"),
+    image: { uri: "https://cdn-icons-png.flaticon.com/512/3306/3306103.png" },
   },
 ];
 

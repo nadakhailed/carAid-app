@@ -23,6 +23,7 @@ import RideDetailsScreen from "./screens/RideDetailsScreen";
 import CancelRideScreen from "./screens/CancelRideScreen";
 import CarOwnerProfileScreen from "./screens/CarOwnerProfileScreen";
 import MechanicProfileScreen from "./screens/MechanicProfileScreen";
+import SparePartsProfileScreen from "./screens/SparePartsProfileScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import SwitchServiceTypeScreen from "./screens/SwitchServiceTypeScreen";
 import MyVehicleScreen from "./screens/MyVehicleScreen";
@@ -184,6 +185,11 @@ export default function App() {
                 <Stack.Screen
                   name="MechanicProfileScreen"
                   component={MechanicProfileScreen}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="SparePartsProfileScreen"
+                  component={SparePartsProfileScreen}
                   options={{ headerShown: false }}
                 />
 
