@@ -1,14 +1,12 @@
-import React, {
-  useEffect,
-  useState,
-  useReducer,
-  useMemo,
-  createContext,
-} from "react";
+import React, { useEffect, useReducer, useMemo, createContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
+import { LogBox } from "react-native";
 
+// Screen imports
 import WelcomeScreen from "./screens/WelcomeScreen";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
@@ -41,40 +39,23 @@ import Reports from "./screens/Reports";
 import Earning from "./screens/Earning";
 import Traffic from "./screens/Traffic";
 import Gated from "./screens/Gated";
-// import HomeScreen from "./screens/HomeScreen";
-// import MapScreen from "./screens/MapScreen";
 import BankDetails from "./screens/BankDetails";
 import SwitchServiceType from "./screens/SwitchServiceType";
 import ThankYouCard from "./screens/ThankYouCard";
-import { Provider } from "react-redux";
-import { store } from "./app/store";
-import { LogBox } from "react-native";
 
 const Stack = createNativeStackNavigator();
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export default function App() {
   const [state, dispatch] = useReducer(
     (prevState, action) => {
       switch (action.type) {
         case "RESTORE_TOKEN":
-          return {
-            ...prevState,
-            userToken: action.token,
-            isLoading: false,
-          };
+          return { ...prevState, userToken: action.token, isLoading: false };
         case "SIGN_IN":
-          return {
-            ...prevState,
-            userToken: action.token,
-            isLoading: false,
-          };
+          return { ...prevState, userToken: action.token, isLoading: false };
         case "SIGN_OUT":
-          return {
-            ...prevState,
-            isSignout: true,
-            userToken: null,
-          };
+          return { ...prevState, isSignout: true, userToken: null };
         default:
           return prevState;
       }
@@ -83,7 +64,7 @@ export default function App() {
       isLoading: true,
       isSignout: false,
       userToken: null,
-    },
+    }
   );
 
   useEffect(() => {
@@ -92,33 +73,32 @@ export default function App() {
       try {
         userToken = await SecureStore.getItemAsync("userToken");
       } catch (e) {
-        console.error(e);
+        console.error("Failed to load token", e);
       }
       dispatch({ type: "RESTORE_TOKEN", token: userToken });
     };
+
     bootstrapAsync();
   }, []);
 
   const authContext = useMemo(
     () => ({
-      signIn: async data => {
-        // Here you should add your sign in logic and get the token
-        const token = "dummy-auth-token";
+      signIn: async (data) => {
+        const token = "dummy-auth-token"; // Replace with actual authentication logic
         await SecureStore.setItemAsync("userToken", token);
-        dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
+        dispatch({ type: "SIGN_IN", token });
       },
       signOut: async () => {
         await SecureStore.deleteItemAsync("userToken");
         dispatch({ type: "SIGN_OUT" });
       },
-      signUp: async data => {
-        // Here you should add your sign up logic and get the token
-        const token = "dummy-auth-token";
+      signUp: async (data) => {
+        const token = "dummy-auth-token"; // Replace with actual registration logic
         await SecureStore.setItemAsync("userToken", token);
         dispatch({ type: "SIGN_IN", token });
       },
     }),
-    [],
+    []
   );
 
   LogBox.ignoreAllLogs();
@@ -127,7 +107,7 @@ export default function App() {
     <Provider store={store}>
       <AuthContext.Provider value={authContext}>
         <NavigationContainer>
-          <Stack.Navigator>
+          <Stack.Navigator initialRouteName="WelcomeScreen">
             {state.userToken == null ? (
               <>
                 <Stack.Screen
@@ -137,25 +117,13 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="Login"
-                  component={({ navigation }) => {
-                    return (
-                      <Login
-                        navigation={navigation}
-                        login={() => {
-                          dispatch({
-                            type: "SIGN_IN",
-                            token: "dummy-auth-token",
-                          });
-                        }}
-                      />
-                    );
-                  }}
+                  component={Login}
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Signup"
                   component={Signup}
-                  options={{ headerShown: false, headerTitle: "" }}
+                  options={{ headerShown: false }}
                 />
               </>
             ) : (
@@ -172,17 +140,18 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="DriverProfileScreen"
-                  component={async ({ navigation }) => {
-                    return (
-                      <DriverProfileScreen
-                        navigation={navigation}
-                        logout={async () => {
-                          await SecureStore.deleteItemAsync("userToken");
-                          dispatch({ type: "SIGN_OUT" });
-                        }}
-                      />
-                    );
-                  }}
+                  component={DriverProfileScreen}
+                  // component={async ({ navigation }) => {
+                  //   return (
+                  //     <DriverProfileScreen
+                  //       navigation={navigation}
+                  //       logout={async () => {
+                  //         await SecureStore.deleteItemAsync("userToken");
+                  //         dispatch({ type: "SIGN_OUT" });
+                  //       }}
+                  //     />
+                  //   );
+                  // }}
                   options={{ headerShown: false }}
                 />
 
@@ -198,35 +167,26 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="CarOwnerProfileScreen"
-                  // component={CarOwnerProfileScreen}
-                  component={({ navigation }) => {
-                    return (
-                      <CarOwnerProfileScreen
-                        navigation={navigation}
-                        logout={async () => {
-                          await SecureStore.deleteItemAsync("userToken");
-                          dispatch({ type: "SIGN_OUT" });
-                        }}
-                      />
-                    );
-                  }}
+                  component={CarOwnerProfileScreen}
+                  // component={({ navigation }) => {
+                  //   return (
+                  //     <CarOwnerProfileScreen
+                  //       navigation={navigation}
+                  //       logout={async () => {
+                  //         await SecureStore.deleteItemAsync("userToken");
+                  //         dispatch({ type: "SIGN_OUT" });
+                  //       }}
+                  //     />
+                  //   );
+                  // }}
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="MechanicProfileScreen"
-                  component={({ navigation }) => {
-                    return (
-                      <MechanicProfileScreen
-                        navigation={navigation}
-                        logout={async () => {
-                          await SecureStore.deleteItemAsync("userToken");
-                          dispatch({ type: "SIGN_OUT" });
-                        }}
-                      />
-                    );
-                  }}
+                  component={MechanicProfileScreen}
                   options={{ headerShown: false }}
                 />
+
                 <Stack.Screen
                   name="SettingsScreen"
                   component={SettingsScreen}
@@ -257,7 +217,7 @@ export default function App() {
                   component={AddMoneyToWalletScreen}
                   options={{ headerShown: false }}
                 />
-<Stack.Screen
+                <Stack.Screen
                   name="ShopListScreen"
                   component={ShopListScreen}
                   options={{ headerShown: false }}
@@ -302,7 +262,6 @@ export default function App() {
                   component={Traffic}
                   options={{ headerShown: false }}
                 />
-
 
                 {/* <Stack.Screen
                   name="MapScreen"
