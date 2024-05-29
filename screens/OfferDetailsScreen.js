@@ -8,7 +8,9 @@ const OfferDetailsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/facebook.png")}
+      source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/1073/1073801.png",
+        }}
         style={styles.profileImage}
       />
       <Text style={styles.question}>Question from {offer.name}</Text>
