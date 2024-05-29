@@ -19,6 +19,7 @@ const Signup = ({ navigation, route }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const language = route?.params?.language;
+  const [name, setName] = useState("");
 
   const dropdownOptions = ["Mechanic", "Spare parts shop", "Car Owner"];
 
@@ -136,7 +137,7 @@ const Signup = ({ navigation, route }) => {
               onPress={() => setShowDropdown(false)}
             >
               <View style={styles.dropdownContainer}>
-                {dropdownOptions.map((option) => (
+                {dropdownOptions.map(option => (
                   <TouchableOpacity
                     key={option}
                     onPress={() => {

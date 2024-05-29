@@ -27,42 +27,26 @@ export default function Login({ navigation, login }) {
       password: password,
     };
 
-    try {
-      const response = await axios.post(
-        "https://newcaraid.onrender.com/api/users/login",
-        data
-      );
+    await axios
+      .post("https://newcaraid.onrender.com/api/users/login", data)
+      .then(async response => {
+        console.log("Response:", response.data.accessToken);
 
-      // Log the entire response for debugging
-      console.log("Response:", response);
-
-      // Access token and status code
-      const token = response.data.accessToken;
-      const statusCode = response.status;
-
-      // Log token and status code for debugging
-      console.log("Token:", token);
-      console.log("Status Code:", statusCode);
-
-      // Check if there is an error message
-      if (response.data.errorMessage) {
-        setErrorMessage(response.data.errorMessage);
-        return; // Exit if there is an error message
-      }
-
-      // Handle successful login
-      if (token) {
+        const token = response.data.accessToken;
         await SecureStore.setItemAsync("userToken", token);
-        navigation.navigate("MapViewNearby");
-        login(); // Call login function
-      }
-    } catch (error) {
-      // Log the error for debugging
-      console.log("Error:", error);
 
-      // Set error message
-      setErrorMessage(error.message);
-    }
+        login();
+      })
+      .catch(err => {
+        console.log(err.response.status);
+        if (err.response.status) {
+          err.response.status == 401
+            ? setErrorMessage("Incorrect email or password")
+            : setErrorMessage("");
+          err.response.status == 400 &&
+            setErrorMessage("Please fill required fields");
+        }
+      });
   };
 
   return (
@@ -157,6 +141,9 @@ export default function Login({ navigation, login }) {
             </TouchableOpacity>
           </View>
         </View>
+        <Text style={{ color: "red", textAlign: "center" }}>
+          {errorMessage}
+        </Text>
 
         <Button
           title="Login"

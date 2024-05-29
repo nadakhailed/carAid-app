@@ -8,7 +8,7 @@ import React, {
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SecureStore from "expo-secure-store";
-// import LanguageSelectionScreen from "./screens/LanguageSelection";
+
 import WelcomeScreen from "./screens/WelcomeScreen";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
@@ -74,7 +74,7 @@ export default function App() {
       isLoading: true,
       isSignout: false,
       userToken: null,
-    }
+    },
   );
 
   useEffect(() => {
@@ -92,24 +92,24 @@ export default function App() {
 
   const authContext = useMemo(
     () => ({
-      signIn: async (data) => {
+      signIn: async data => {
         // Here you should add your sign in logic and get the token
         const token = "dummy-auth-token";
         await SecureStore.setItemAsync("userToken", token);
-        dispatch({ type: "SIGN_IN", token });
+        dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
       },
       signOut: async () => {
         await SecureStore.deleteItemAsync("userToken");
         dispatch({ type: "SIGN_OUT" });
       },
-      signUp: async (data) => {
+      signUp: async data => {
         // Here you should add your sign up logic and get the token
         const token = "dummy-auth-token";
         await SecureStore.setItemAsync("userToken", token);
         dispatch({ type: "SIGN_IN", token });
       },
     }),
-    []
+    [],
   );
 
   LogBox.ignoreAllLogs();
@@ -128,7 +128,19 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="Login"
-                  component={Login}
+                  component={({ navigation }) => {
+                    return (
+                      <Login
+                        navigation={navigation}
+                        login={() => {
+                          dispatch({
+                            type: "SIGN_IN",
+                            token: "dummy-auth-token",
+                          });
+                        }}
+                      />
+                    );
+                  }}
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen
@@ -151,7 +163,17 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="DriverProfileScreen"
-                  component={DriverProfileScreen}
+                  component={async ({ navigation }) => {
+                    return (
+                      <DriverProfileScreen
+                        navigation={navigation}
+                        logout={async () => {
+                          await SecureStore.deleteItemAsync("userToken");
+                          dispatch({ type: "SIGN_OUT" });
+                        }}
+                      />
+                    );
+                  }}
                   options={{ headerShown: false }}
                 />
 
@@ -167,12 +189,33 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="CarOwnerProfileScreen"
-                  component={CarOwnerProfileScreen}
+                  // component={CarOwnerProfileScreen}
+                  component={({ navigation }) => {
+                    return (
+                      <CarOwnerProfileScreen
+                        navigation={navigation}
+                        logout={async () => {
+                          await SecureStore.deleteItemAsync("userToken");
+                          dispatch({ type: "SIGN_OUT" });
+                        }}
+                      />
+                    );
+                  }}
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="MechanicProfileScreen"
-                  component={MechanicProfileScreen}
+                  component={({ navigation }) => {
+                    return (
+                      <MechanicProfileScreen
+                        navigation={navigation}
+                        logout={async () => {
+                          await SecureStore.deleteItemAsync("userToken");
+                          dispatch({ type: "SIGN_OUT" });
+                        }}
+                      />
+                    );
+                  }}
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen

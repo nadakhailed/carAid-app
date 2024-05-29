@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import COLORS from "../constants/colors";
 
-const CarOwnerProfileScreen = ({ navigation }) => {
+const CarOwnerProfileScreen = ({ navigation, logout }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -46,10 +46,7 @@ const CarOwnerProfileScreen = ({ navigation }) => {
         >
           <Text style={styles.menuItemText}>Switch</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate("Logout")}
-        >
+        <TouchableOpacity style={styles.menuItem} onPress={() => logout()}>
           <Text style={styles.menuItemText}>Logout</Text>
         </TouchableOpacity>
       </View>

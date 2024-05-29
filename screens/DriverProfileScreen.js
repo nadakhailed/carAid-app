@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import COLORS from "../constants/colors";
 
-const DriverProfileScreen = ({ navigation }) => {
+const DriverProfileScreen = ({ navigation, logout }) => {
   const handleBackToMap = () => {
     navigation.goBack();
   };

@@ -11,6 +11,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import COLORS from "../constants/colors";
 import MapView, { Marker } from "react-native-maps";
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 
 const MapViewNearby = ({ navigation }) => {
   const today = new Date().toDateString();
@@ -50,11 +52,11 @@ const MapViewNearby = ({ navigation }) => {
     setOrderModalVisible(false);
   };
 
-  const selectOption = (option) => {
+  const selectOption = option => {
     if (selectedOptions.length < 2 && !selectedOptions.includes(option)) {
       setSelectedOptions([...selectedOptions, option]);
     } else if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((item) => item !== option));
+      setSelectedOptions(selectedOptions.filter(item => item !== option));
     }
   };
 
@@ -85,7 +87,7 @@ const MapViewNearby = ({ navigation }) => {
     }
   };
 
-  const calculateDistance = (marker) => {
+  const calculateDistance = marker => {
     const R = 6371;
     const dLat = ((marker.latitude - userLocation.latitude) * Math.PI) / 180;
     const dLon = ((marker.longitude - userLocation.longitude) * Math.PI) / 180;
@@ -100,7 +102,7 @@ const MapViewNearby = ({ navigation }) => {
     return distance.toFixed(2);
   };
 
-  const onMarkerPress = (marker) => {
+  const onMarkerPress = marker => {
     setSelectedMarker(marker);
     setMenuVisible(true);
   };
@@ -304,10 +306,11 @@ const MapViewNearby = ({ navigation }) => {
   useEffect(() => {
     const fetchToken = async () => {
       try {
-        const userToken = await AsyncStorage.getItem("userToken");
-        if (!userToken) {
-          navigation.navigate("Login");
+        const userToken = await SecureStore.getItemAsync("userToken");
+        if (userToken) {
+          axios.defaults.headers.common.Authorization = `Bearer ${userToken}`;
         }
+
         // setToken(userToken);
       } catch (error) {
         console.error("Error fetching user token", error);
@@ -325,6 +328,7 @@ const MapViewNearby = ({ navigation }) => {
     <View style={styles.container}>
       <MapView
         style={styles.map}
+        mapType="standard"
         initialRegion={{
           ...userLocation,
           latitudeDelta: 0.01,
@@ -375,7 +379,7 @@ const MapViewNearby = ({ navigation }) => {
 
       {/* Menu Button */}
       <TouchableOpacity style={styles.menuButton} onPress={openMenu}>
-        <Text style={styles.menuButtonText}>Menu</Text>
+        <Text style={styles.menuButtonText}>Search</Text>
       </TouchableOpacity>
     </View>
   );
@@ -386,6 +390,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
+    paddingBottom: "15%",
+
     backgroundColor: COLORS.white, // Assuming light background color
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -406,8 +412,8 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     position: "absolute",
-    top: 35,
-    right: 20,
+    top: "8%",
+    right: "5%",
     zIndex: 10,
   },
   profileImage: {
@@ -423,15 +429,16 @@ const styles = StyleSheet.create({
   },
   titleToday: {
     position: "absolute",
-    top: 40,
-    left: 10,
+    top: "8%",
+
     fontSize: 18,
-    color: COLORS.darkColorPrim,
+    color: COLORS.darkGrey,
     backgroundColor: COLORS.white,
     width: 180,
     textAlign: "center",
-    padding: 5,
-    borderRadius: 5,
+    padding: "3%",
+    borderRadius: 35,
+
     marginLeft: 105,
     zIndex: 10,
   },
@@ -444,7 +451,7 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     position: "absolute",
-    bottom: 20,
+    bottom: "5%",
     alignSelf: "center",
     backgroundColor: COLORS.darkColorPrim,
     paddingVertical: 12,
