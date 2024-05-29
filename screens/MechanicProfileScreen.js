@@ -10,7 +10,7 @@ const MechanicProfileScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require("../assets/facebook.png")}
+          source={{ uri: "https://www.gravatar.com/avatar/?d=mp" }}
           style={styles.profileImage}
         />
         <Text style={styles.userName}>User Name</Text>
