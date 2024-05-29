@@ -31,6 +31,15 @@ import MyVehicleScreen from "./screens/MyVehicleScreen";
 import VehicleDetailsScreen from "./screens/VehicleDetailsScreen";
 import MyWalletScreen from "./screens/MyWalletScreen";
 import AddMoneyToWalletScreen from "./screens/AddMoneyToWalletScreen";
+import ShopListScreen from "./screens/ShopListScreen";
+import OfferDetailsScreen from "./screens/OfferDetailsScreen";
+import OffersScreen from "./screens/OffersScreen";
+import ShopDetailScreen from "./screens/ShopDetailScreen";
+import HomeNav from "./screens/HomeNav";
+import Statistics from "./screens/Statistics";
+import Reports from "./screens/Reports";
+import Earning from "./screens/Earning";
+import Traffic from "./screens/Traffic";
 import Gated from "./screens/Gated";
 // import HomeScreen from "./screens/HomeScreen";
 // import MapScreen from "./screens/MapScreen";
@@ -248,6 +257,52 @@ export default function App() {
                   component={AddMoneyToWalletScreen}
                   options={{ headerShown: false }}
                 />
+<Stack.Screen
+                  name="ShopListScreen"
+                  component={ShopListScreen}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="ShopDetailScreen"
+                  component={ShopDetailScreen}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="OfferDetailsScreen"
+                  component={OfferDetailsScreen}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="OffersScreen"
+                  component={OffersScreen}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="HomeNav"
+                  component={HomeNav}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Statistics"
+                  component={Statistics}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Reports"
+                  component={Reports}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Earning"
+                  component={Earning}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Traffic"
+                  component={Traffic}
+                  options={{ headerShown: false }}
+                />
+
 
                 {/* <Stack.Screen
                   name="MapScreen"
