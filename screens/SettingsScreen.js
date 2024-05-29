@@ -26,11 +26,15 @@ const SettingsScreen = ({ route, navigation }) => {
             <Text style={styles.menuItemText}>My Vehicle</Text>
           </TouchableOpacity>
         )}
-        {userType === "mechanic" && (
-          <TouchableOpacity style={styles.menuItem} onPress={handleWalletPress}>
-            <Text style={styles.menuItemText}>My Wallet</Text>
-          </TouchableOpacity>
-        )}
+        {userType === "mechanic" ||
+          (userType === "spareParts" && (
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={handleWalletPress}
+            >
+              <Text style={styles.menuItemText}>My Wallet</Text>
+            </TouchableOpacity>
+          ))}
         <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuItemText}>Personal Document</Text>
         </TouchableOpacity>
